@@ -6,6 +6,7 @@ models:
   config:
     contract:
       enforced: true
+  latest_version: 1
   columns:
   - name: order_id
     data_type: string
@@ -51,3 +52,14 @@ models:
     data_type: int
     description: The year when the order was placed, extracted from the ordered_at
       timestamp.
+
+  versions:
+    - v: 1
+    - v: 2
+      columns:
+        - name: order_amount
+          data_type: decimal
+        - name: location_opened_at
+          data_type: date
+        - include: all
+          exclude: [order_total]
