@@ -4,6 +4,8 @@ models:
     location information, as well as order totals and tax details. It is useful for
     analyzing order patterns, customer behavior, and location performance over time.
   config:
+    access: public
+    group: finance
     contract:
       enforced: true
   latest_version: 1
