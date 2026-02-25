@@ -1,0 +1,67 @@
+models:
+- name: fct_orders
+  description: This model provides a detailed view of orders, including customer and
+    location information, as well as order totals and tax details. It is useful for
+    analyzing order patterns, customer behavior, and location performance over time.
+  config:
+    access: public
+    group: finance
+    contract:
+      enforced: true
+  latest_version: 1
+  columns:
+  - name: order_id
+    data_type: string
+    description: A unique identifier for each order.
+    constraints:
+      - type: not_null
+  - name: location_id
+    data_type: string
+    description: A unique identifier for the location where the order was placed.
+  - name: customer_id
+    data_type: string
+    description: A unique identifier for the customer who placed the order.
+  - name: order_total
+    data_type: decimal
+    description: The total amount for the order, including all items and services.
+  - name: tax_paid
+    data_type: decimal
+    description: The total tax amount paid for the order.
+  - name: ordered_at
+    data_type: timestamp
+    description: The timestamp when the order was placed.
+  - name: customer_name
+    data_type: string
+    description: The name of the customer who placed the order.
+  - name: location_name
+    data_type: string
+    description: The name of the location where the order was placed.
+  - name: tax_rate
+    data_type: double
+    description: The tax rate applied to the order.
+  - name: location_opened_at
+    data_type: timestamp
+    description: The timestamp when the location was opened.
+  - name: ordered_month
+    data_type: int
+    description: The month when the order was placed, extracted from the ordered_at
+      timestamp.
+  - name: ordered_day
+    data_type: int
+    description: The day when the order was placed, extracted from the ordered_at
+      timestamp.
+  - name: ordered_year
+    data_type: int
+    description: The year when the order was placed, extracted from the ordered_at
+      timestamp.
+
+  versions:
+    - v: 1
+    - v: 2
+      columns:
+        - name: order_amount
+          data_type: decimal
+        - name: location_opened_at
+          data_type: date
+        - include: all
+          exclude: [order_total]
