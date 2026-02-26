@@ -1,34 +1,75 @@
-with orders as (
-    select * from {{ ref('stg_orders') }}
-),
-
-customers as (
-    select * from {{ ref('stg_customers') }}
-),
-
-locations as (
-    select * from {{ ref('stg_locations') }}
-),
-
-joined as (
-    select
-        orders.order_id, 
-        orders.location_id,
-        orders.customer_id,
-        orders.order_total,
-        orders.tax_paid,
-        orders.ordered_at,
-        customers.customer_name,
-        locations.location_name,
-        locations.tax_rate,
-        locations.location_opened_at
-
-    from 
-       orders 
-        left join customers 
-            on orders.customer_id = customers.customer_id
-        left join locations 
-            on orders.location_id = locations.location_id    
+WITH stg_orders AS (
+  SELECT
+    *
+  FROM {{ ref('stg_orders') }}
+), stg_customers AS (
+  SELECT
+    *
+  FROM {{ ref('stg_customers') }}
+), stg_locations AS (
+  SELECT
+    *
+  FROM {{ ref('stg_locations') }}
+), rename_1 AS (
+  SELECT
+    location_id AS orders_location_id,
+    customer_id AS orders_customer_id,
+    *
+    EXCEPT (location_id, customer_id)
+  FROM stg_orders
+), rename_2 AS (
+  SELECT
+    customer_id AS customers_customer_id,
+    *
+    EXCEPT (customer_id)
+  FROM stg_customers
+), rename_3 AS (
+  SELECT
+    location_id AS locations_location_id,
+    *
+    EXCEPT (location_id)
+  FROM stg_locations
+), join_1 AS (
+  SELECT
+    *
+  FROM rename_1
+  LEFT JOIN rename_2
+    ON rename_1.orders_customer_id = rename_2.customers_customer_id
+), join_2 AS (
+  SELECT
+    *
+  FROM join_1
+  LEFT JOIN rename_3
+    ON join_1.orders_location_id = rename_3.locations_location_id
+), rename_4 AS (
+  SELECT
+    order_id,
+    orders_location_id AS location_id,
+    orders_customer_id AS customer_id,
+    order_total,
+    tax_paid,
+    ordered_at,
+    customer_name,
+    location_name,
+    tax_rate,
+    location_opened_at
+  FROM join_2
+), int_orders AS (
+  /* My orders model
+*/
+  SELECT
+    order_id,
+    location_id,
+    customer_id,
+    order_total,
+    tax_paid,
+    ordered_at,
+    customer_name,
+    location_name,
+    tax_rate,
+    location_opened_at
+  FROM rename_4
 )
-
-select * from joined
+SELECT
+  *
+FROM int_orders
